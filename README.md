@@ -40,3 +40,10 @@ flowchart TD
     G --> I[Results]
     H --> I
     I --> B
+---
+
+<div align="center">
+
+**StudyLens AI — Learn, Practice, and Grow with AI 💜**
+
+</div>
