@@ -2,52 +2,55 @@
 
 # 📚 StudyLens AI
 
-### An AI-powered study companion
+### AI-Powered Study Companion
 
-Learn smarter with AI-powered tutoring, study materials, and interactive quizzes.
+An interactive platform that helps students learn, practice, and revise using AI.
 
 </div>
 
 ---
 
-## 💡 About
+## About
 
-StudyLens AI is an AI-powered learning platform designed to help students study more effectively.
+StudyLens AI brings study materials, AI tutoring, and quiz generation together in one place to make learning easier and more interactive.
 
-It brings study materials, AI tutoring, and quiz generation together in one simple application, making learning more interactive and accessible.
+## Features
 
-## ✨ Features
+- AI-powered tutoring and explanations
+- Study material uploads
+- AI-generated quizzes
+- Learning progress tracking
+- Student dashboard
 
-- **AI Tutor** — Ask questions and get AI-generated explanations.
-- **Study Materials** — Upload and access learning resources.
-- **AI Quiz Generation** — Create quizzes for practice and self-assessment.
-- **Progress Tracking** — Track quiz activity and learning progress.
-- **Dashboard** — Access study tools in one place.
+## Tech Stack
 
-## 🛠️ Tech Stack
+Next.js · TypeScript · Tailwind CSS · Groq · Supabase
 
-- Next.js
-- TypeScript
-- Tailwind CSS
-- Groq API
-- Supabase
-
-## 🏗️ System Architecture
+## System Architecture
 
 ```mermaid
 flowchart TD
     A[Student] --> B[StudyLens AI]
-    B --> C[Next.js Frontend]
-    C --> D[Application Backend]
-    D --> E[Groq API]
+    B --> C[Dashboard and Study Tools]
+    C --> D[Next.js API Routes]
+    D --> E[Groq AI]
     D --> F[Supabase]
-    E --> G[AI Tutor and Quiz Generation]
+    E --> G[AI Responses and Quizzes]
     F --> H[Authentication and Data]
-    G --> I[Results displayed to Student]
+    G --> I[Results]
     H --> I
+    I --> B
 ```
 
-## ⚙️ Run Locally
+## Workflow
+
+1. Student accesses StudyLens.
+2. Selects a study tool.
+3. Sends a question, material, or quiz request.
+4. AI or backend services process the request.
+5. Results are displayed in the application.
+
+## Getting Started
 
 ```bash
 git clone https://github.com/YOUR-USERNAME/YOUR-REPOSITORY.git
@@ -56,12 +59,12 @@ npm install
 npm run dev
 ```
 
-Configure the required Supabase and Groq environment variables in `.env.local` before running the application.
+Configure the required Supabase and Groq environment variables in `.env.local`.
 
 ---
 
 <div align="center">
 
-**StudyLens AI — Making learning more interactive with AI.**
+Made to make learning more interactive with AI 💜
 
 </div>
