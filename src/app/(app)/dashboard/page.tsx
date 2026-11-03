@@ -1,269 +1,283 @@
-
 "use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import {
+  ArrowRight,
+  BookOpen,
+  Bot,
+  ClipboardCheck,
+  FileText,
+  FileUp,
+  Sparkles,
+  Target,
+} from "lucide-react";
+
 import { PageHeader } from "@/components/layout/page-header";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-
-type Material = {
-  id?: string;
-  title?: string;
-  name?: string;
-  fileName?: string;
-  filename?: string;
-  topic?: string;
-  subject?: string;
-};
+import { EmptyState } from "@/components/ui/empty-state";
+import { StatCard } from "@/components/ui/stat-card";
+import { useStudyData } from "@/hooks/use-study-data";
+import {
+  averagePercentage,
+  formatRelativeDate,
+  getGreeting,
+} from "@/lib/study-data";
+import { cn } from "@/lib/utils";
 
 type QuizAttempt = {
-  id?: string;
-  date?: string;
-  title?: string;
+  id: string;
+  title: string;
   materialName?: string;
-  score: number;
-  maxScore: number;
+  date: string;
   percentage: number;
 };
 
 export default function DashboardPage() {
-  const [materials, setMaterials] = useState<Material[]>([]);
-  const [attempts, setAttempts] = useState<QuizAttempt[]>([]);
+  const { materials, attempts, ready } = useStudyData();
+
+  const [greeting, setGreeting] = useState("Welcome back");
 
   useEffect(() => {
-    function loadDashboard() {
-      try {
-        const savedMaterials = JSON.parse(
-          localStorage.getItem("studylens-materials") || "[]"
-        );
-
-        const savedAttempts = JSON.parse(
-          localStorage.getItem("studylens-quiz-history") || "[]"
-        );
-
-        setMaterials(
-          Array.isArray(savedMaterials) ? savedMaterials : []
-        );
-        setAttempts(
-          Array.isArray(savedAttempts) ? savedAttempts : []
-        );
-      } catch (error) {
-        console.error("Could not load dashboard data:", error);
-        setMaterials([]);
-        setAttempts([]);
-      }
-    }
-
-    loadDashboard();
-    window.addEventListener("focus", loadDashboard);
-    window.addEventListener("storage", loadDashboard);
-
-    return () => {
-      window.removeEventListener("focus", loadDashboard);
-      window.removeEventListener("storage", loadDashboard);
-    };
+    setGreeting(getGreeting());
   }, []);
 
-  const validAttempts = attempts.filter(
-    (attempt) =>
-      Number.isFinite(attempt.percentage) &&
-      attempt.percentage >= 0 &&
-      attempt.percentage <= 100
-  );
+  const averageScore = averagePercentage(attempts);
 
-  const averageScore =
-    validAttempts.length > 0
-      ? Math.round(
-          validAttempts.reduce(
-            (total, attempt) => total + attempt.percentage,
-            0
-          ) / validAttempts.length
-        )
-      : 0;
+  const latestMaterial =
+    materials.length > 0 ? materials[materials.length - 1] : null;
 
-  function materialTitle(material: Material) {
-    return (
-      material.title ||
-      material.name ||
-      material.fileName ||
-      material.filename ||
-      "Untitled material"
-    );
-  }
+  const recentMaterials = [...materials].reverse().slice(0, 4);
+
+  const recentAttempts: QuizAttempt[] = attempts.slice(0, 3);
 
   return (
     <>
       <PageHeader
-        title="Your study desk"
-        description="Pick up where you left off, explore your materials, and track your learning."
+        title={greeting}
+        description="Pick up where you left off, or start something new."
+        action={
+          <Link href="/tutor" className={buttonVariants()}>
+            <Sparkles />
+            Ask the AI tutor
+          </Link>
+        }
       />
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">
-              Saved materials
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">{materials.length}</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Materials in this browser
-            </p>
-            <Link
-              href="/materials"
-              className="mt-4 inline-block text-sm font-medium text-primary hover:underline"
-            >
-              View materials →
-            </Link>
-          </CardContent>
-        </Card>
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatCard
+          label="Study materials"
+          value={ready ? String(materials.length) : "–"}
+          suffix={materials.length === 1 ? "file" : "files"}
+          icon={BookOpen}
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">
-              Completed quizzes
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">{attempts.length}</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Saved quiz attempts
-            </p>
-            <Link
-              href="/quiz"
-              className="mt-4 inline-block text-sm font-medium text-primary hover:underline"
-            >
-              Practise now →
-            </Link>
-          </CardContent>
-        </Card>
+        <StatCard
+          label="Quizzes taken"
+          value={ready ? String(attempts.length) : "–"}
+          suffix="completed"
+          icon={ClipboardCheck}
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">
-              Average quiz score
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">{averageScore}%</p>
-            <Progress value={averageScore} className="mt-3" />
-            <p className="mt-2 text-sm text-muted-foreground">
-              {validAttempts.length > 0
-                ? "Based on saved quiz results"
-                : "Complete a quiz to start tracking"}
-            </p>
-          </CardContent>
-        </Card>
+        <StatCard
+          label="Average score"
+          value={
+            ready && attempts.length > 0 ? String(averageScore) : "–"
+          }
+          suffix={attempts.length > 0 ? "%" : undefined}
+          hint={
+            attempts.length > 0
+              ? undefined
+              : "Complete a quiz to see your score"
+          }
+          icon={Target}
+        />
+      </div>
 
-        <Card className="lg:col-span-3">
-          <CardHeader>
-            <CardTitle>Pick up where you left off</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-3 sm:grid-cols-2">
-            <Link
-              href="/materials"
-              className="rounded-xl border p-4 transition-colors hover:bg-muted"
-            >
-              <p className="font-medium">Explore materials</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Open your study resources.
-              </p>
-            </Link>
-
-            <Link
-              href="/quiz"
-              className="rounded-xl border p-4 transition-colors hover:bg-muted"
-            >
-              <p className="font-medium">Take a quiz</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Test your understanding and save your results.
-              </p>
-            </Link>
-          </CardContent>
-        </Card>
-
-        <Card className="lg:col-span-3">
-          <CardHeader className="flex flex-row items-center justify-between gap-3">
-            <CardTitle>Recent materials</CardTitle>
-            <Link
-              href="/materials"
-              className="text-sm text-primary hover:underline"
-            >
-              View all
-            </Link>
-          </CardHeader>
-          <CardContent>
-            {materials.length === 0 ? (
-              <div className="py-6 text-center">
-                <p className="font-medium">Your study desk is waiting!</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Add a material to see it here.
+      <Card className="mt-6 overflow-hidden bg-linear-to-br from-secondary/80 via-card to-card">
+        <div className="flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+          {latestMaterial ? (
+            <>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold tracking-wider text-primary uppercase">
+                  Latest material
                 </p>
+
+                <h2 className="mt-2 truncate text-xl font-semibold sm:text-2xl">
+                  {latestMaterial.name}
+                </h2>
+
+                <p className="mt-1.5 text-sm text-muted-foreground">
+                  {latestMaterial.pages > 0
+                    ? `${latestMaterial.pages} pages · `
+                    : ""}
+                  Ready for tutoring and practice quizzes.
+                </p>
+              </div>
+
+              <div className="flex shrink-0 flex-wrap gap-2">
+                <Link href="/tutor" className={buttonVariants()}>
+                  <Bot />
+                  Ask the tutor
+                </Link>
+
                 <Link
-                  href="/materials"
-                  className="mt-3 inline-block text-sm font-medium text-primary hover:underline"
+                  href="/quiz"
+                  className={buttonVariants({ variant: "outline" })}
                 >
-                  Go to Materials →
+                  Generate a quiz
                 </Link>
               </div>
-            ) : (
-              <div className="divide-y">
-                {[...materials].reverse().slice(0, 5).map((material, index) => (
-                  <div
-                    key={material.id ?? `${materialTitle(material)}-${index}`}
-                    className="flex items-center justify-between gap-3 py-3 text-sm"
-                  >
-                    <span className="min-w-0 truncate font-medium">
-                      {materialTitle(material)}
-                    </span>
-                    <Badge>
-                      {material.topic || material.subject || "Study material"}
-                    </Badge>
-                  </div>
-                ))}
+            </>
+          ) : (
+            <>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold tracking-wider text-primary uppercase">
+                  Get started
+                </p>
+
+                <h2 className="mt-2 text-xl font-semibold sm:text-2xl">
+                  Add your first study material
+                </h2>
+
+                <p className="mt-1.5 max-w-lg text-sm text-muted-foreground">
+                  Upload a PDF of your notes, slides or textbook chapters. The
+                  AI tutor and quiz generator will use it.
+                </p>
               </div>
+
+              <Link
+                href="/materials"
+                className={cn(buttonVariants(), "shrink-0")}
+              >
+                <FileUp />
+                Upload a PDF
+              </Link>
+            </>
+          )}
+        </div>
+      </Card>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardHeader className="items-center">
+            <CardTitle>Recent materials</CardTitle>
+
+            <Link
+              href="/materials"
+              className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+            >
+              View all
+              <ArrowRight className="size-3.5" />
+            </Link>
+          </CardHeader>
+
+          <CardContent>
+            {recentMaterials.length === 0 ? (
+              <EmptyState
+                icon={FileText}
+                title="No materials yet"
+                description="Materials you upload will appear here."
+                className="py-8"
+              />
+            ) : (
+              <ul className="divide-y">
+                {recentMaterials.map((material) => (
+                  <li
+                    key={material.id}
+                    className="flex items-center gap-3 py-3"
+                  >
+                    <span
+                      aria-hidden
+                      className="grid size-9 shrink-0 place-items-center rounded-lg bg-secondary text-primary"
+                    >
+                      <FileText className="size-4" />
+                    </span>
+
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium">
+                        {material.name}
+                      </p>
+
+                      <p className="text-xs text-muted-foreground">
+                        {material.pages > 0
+                          ? `${material.pages} pages`
+                          : "Text extracted"}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             )}
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-3">
-          <CardHeader>
-            <CardTitle>Recent quiz activity</CardTitle>
+        <Card>
+          <CardHeader className="items-center">
+            <CardTitle>Recent quizzes</CardTitle>
+
+            <Link
+              href="/progress"
+              className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+            >
+              View progress
+              <ArrowRight className="size-3.5" />
+            </Link>
           </CardHeader>
+
           <CardContent>
-            {attempts.length === 0 ? (
-              <p className="py-4 text-sm text-muted-foreground">
-                Your completed quizzes will appear here.
-              </p>
+            {recentAttempts.length === 0 ? (
+              <EmptyState
+                icon={ClipboardCheck}
+                title="No quizzes yet"
+                description="Your completed quizzes will appear here."
+                action={
+                  <Link
+                    href="/quiz"
+                    className={buttonVariants({
+                      variant: "secondary",
+                      size: "sm",
+                    })}
+                  >
+                    Take a quiz
+                  </Link>
+                }
+                className="py-8"
+              />
             ) : (
-              <div className="divide-y">
-                {[...attempts].reverse().slice(0, 3).map((attempt, index) => (
-                  <div
-                    key={attempt.id ?? `${attempt.date ?? "quiz"}-${index}`}
+              <ul className="divide-y">
+                {recentAttempts.map((attempt: QuizAttempt) => (
+                  <li
+                    key={attempt.id}
                     className="flex items-center justify-between gap-3 py-3"
                   >
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium">
-                        {attempt.title || attempt.materialName || "Study quiz"}
+                        {attempt.title}
                       </p>
-                      <p className="text-sm text-muted-foreground">
-                        {attempt.score} / {attempt.maxScore} points
+
+                      <p className="truncate text-xs text-muted-foreground">
+                        {[
+                          attempt.materialName,
+                          formatRelativeDate(attempt.date),
+                        ]
+                          .filter(Boolean)
+                          .join(" · ")}
                       </p>
                     </div>
-                    <span className="shrink-0 text-sm font-semibold">
+
+                    <span className="shrink-0 text-sm font-semibold text-primary tabular-nums">
                       {Math.round(attempt.percentage)}%
                     </span>
-                  </div>
+                  </li>
                 ))}
-              </div>
+              </ul>
             )}
           </CardContent>
         </Card>
