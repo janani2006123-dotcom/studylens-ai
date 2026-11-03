@@ -40,6 +40,16 @@ flowchart TD
     G --> I[Results]
     H --> I
     I --> B
+```
+
+## Workflow
+
+1. Student accesses StudyLens.
+2. Selects a study tool.
+3. Sends a question, material, or quiz request.
+4. AI or backend services process the request.
+5. Results are displayed in the application.
+
 ---
 
 <div align="center">
