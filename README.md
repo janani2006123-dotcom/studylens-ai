@@ -2,140 +2,66 @@
 
 # 📚 StudyLens AI
 
-### AI-Powered Personalized Learning Companion
+### An AI-powered study companion
 
-An interactive study platform that combines study materials, AI tutoring, and quiz generation to make learning more engaging and effective.
+Learn smarter with AI-powered tutoring, study materials, and interactive quizzes.
 
 </div>
 
 ---
 
-## Overview
+## 💡 About
 
-StudyLens AI is a web-based learning companion designed to help students understand concepts, revise study materials, and practice through AI-generated quizzes.
+StudyLens AI is an AI-powered learning platform designed to help students study more effectively.
 
-The platform brings essential study tools together in one place, offering a more interactive approach to learning.
+It brings study materials, AI tutoring, and quiz generation together in one simple application, making learning more interactive and accessible.
 
-## Features
+## ✨ Features
 
-- **AI Tutor:** Ask questions and receive AI-generated explanations.
-- **Study Materials:** Upload and access learning resources.
-- **AI Quiz Generation:** Generate quizzes for practice and self-assessment.
-- **Progress Tracking:** Review quiz attempts and learning activity.
-- **Student Dashboard:** Access study tools through a centralized interface.
+- **AI Tutor** — Ask questions and get AI-generated explanations.
+- **Study Materials** — Upload and access learning resources.
+- **AI Quiz Generation** — Create quizzes for practice and self-assessment.
+- **Progress Tracking** — Track quiz activity and learning progress.
+- **Dashboard** — Access study tools in one place.
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-| Technology | Role |
-|---|---|
-| Next.js | Frontend and application framework |
-| TypeScript | Application development |
-| Tailwind CSS | UI styling |
-| Groq API | AI-powered responses and quiz generation |
-| Supabase | Authentication and backend services |
+- Next.js
+- TypeScript
+- Tailwind CSS
+- Groq API
+- Supabase
 
-## System Architecture
-
-```mermaid
-flowchart TB
-    User([Student])
-
-    subgraph Frontend["Frontend — Next.js"]
-        Dashboard[Dashboard]
-        Materials[Study Materials]
-        Tutor[AI Tutor]
-        Quiz[Quiz Interface]
-        Progress[Progress Tracking]
-    end
-
-    subgraph Backend["Application Layer — Next.js"]
-        API[API Routes]
-        MaterialHandler[Material Processing]
-        ChatHandler[AI Tutor Handler]
-        QuizHandler[Quiz Generation Handler]
-    end
-
-    subgraph Services["External Services"]
-        Groq[Groq API]
-        Supabase[Supabase]
-    end
-
-    User --> Dashboard
-    Dashboard --> Materials
-    Dashboard --> Tutor
-    Dashboard --> Quiz
-    Dashboard --> Progress
-
-    Materials --> API
-    Tutor --> API
-    Quiz --> API
-
-    API --> MaterialHandler
-    API --> ChatHandler
-    API --> QuizHandler
-
-    ChatHandler --> Groq
-    QuizHandler --> Groq
-
-    API --> Supabase
-
-    Groq --> API
-    Supabase --> API
-    API --> Frontend
-    Frontend --> User
-```
-
-## Application Workflow
+## 🏗️ System Architecture
 
 ```mermaid
 flowchart TD
-    A[Student Opens StudyLens AI] --> B[Access Dashboard]
-    B --> C{Choose Study Tool}
-
-    C --> D[Upload Study Material]
-    C --> E[Ask AI Tutor]
-    C --> F[Generate Quiz]
-
-    D --> G[Process Request]
-    E --> G
-    F --> G
-
-    G --> H[Backend and AI Services]
-    H --> I[Display Results]
-    I --> J[Practice and Review]
+    A[Student] --> B[StudyLens AI]
+    B --> C[Next.js Frontend]
+    C --> D[Application Backend]
+    D --> E[Groq API]
+    D --> F[Supabase]
+    E --> G[AI Tutor and Quiz Generation]
+    F --> H[Authentication and Data]
+    G --> I[Results displayed to Student]
+    H --> I
 ```
 
-## Getting Started
-
-### Prerequisites
-
-- Node.js
-- npm
-- Supabase credentials
-- Groq API key
-
-### Installation
+## ⚙️ Run Locally
 
 ```bash
 git clone https://github.com/YOUR-USERNAME/YOUR-REPOSITORY.git
 cd YOUR-REPOSITORY
 npm install
-```
-
-Create a `.env.local` file and configure the required environment variables for Supabase and Groq.
-
-Run the development server:
-
-```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Configure the required Supabase and Groq environment variables in `.env.local` before running the application.
 
 ---
 
 <div align="center">
 
-**StudyLens AI — Learn, practice, and grow with AI.**
+**StudyLens AI — Making learning more interactive with AI.**
 
 </div>
